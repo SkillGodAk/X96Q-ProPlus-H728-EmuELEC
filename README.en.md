@@ -13,6 +13,9 @@ An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-car
 | Default boot | **EmuELEC** | **Original Android** |
 | Android ROOT required? | **No** | **Yes, original Android must already be rooted** |
 | Original remote wake after shutdown | **Supported — wakes into EmuELEC** | **Supported — wakes into Android** |
+| Original remote controls (Up/Down/Left/Right, Back, OK) | Supported | Supported |
+| Bluetooth | Supported | Supported |
+| One-to-two controller recognition (two gamepads) | Supported | Supported |
 | GameSwitch APK | Not needed | Required to enter EE from Android |
 | Automatic EEROMS game storage | Supported | Supported after entering EE |
 | Crystal / emulators / controller setup | Supported | Supported |
@@ -25,11 +28,12 @@ An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-car
 
 - **Made ready for X96Q Pro+**: Boot EmuELEC from an SD card without having to figure out the box-specific setup yourself.
 - **Use the original remote to shut down and wake the box**: NoRoot wakes into EmuELEC; Root wakes back into Android.
+- **Original remote navigation**: Use Up, Down, Left and Right to move around, with Back and OK to select and return.
+- **Bluetooth support**: Use the Bluetooth connection features built into the system.
+- **Two-controller recognition**: Supports one-to-two gamepad recognition, with controller settings available for both gamepads.
 - **Game storage sets itself up**: On the first EmuELEC start, the game partition is prepared for your SD card's capacity. Later boots don't repeat the setup.
 - **A familiar interface from the start**: Crystal theme, Traditional Chinese defaults, game folders, and included emulator cores. Bring your own games and any required BIOS files.
 - **Keep Android available**: With Root, use the GameSwitch APK in the original Android system to enter EmuELEC.
-
-These are conveniences prepared for the X96Q Pro+. Some features may also be available in standard EmuELEC 4.8.
 
 ## Downloads
 

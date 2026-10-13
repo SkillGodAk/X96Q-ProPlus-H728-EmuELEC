@@ -1,0 +1,38 @@
+{
+    "date":  "2026-10-14",
+    "release_images":  {
+                           "NoRoot":  {
+                                          "image_sha256":  "97d67fb8d0cb0f27f7e3682a7a0be28d859a92ec522cb448d302b205f44036c9",
+                                          "archive_sha256":  "9722ac827ba50234f8211cfe38cadfbb1d5b7e2d607bf366bd12e6805041eab5"
+                                      },
+                           "Root":  {
+                                        "image_sha256":  "f7340855da489c164fc4b0994ec13f56a357a95a1b393d57496f424a38c552b3",
+                                        "archive_sha256":  "528a9a09839546c6339d0dd129c5a4131422487d7bdd59126856afc2d176314b"
+                                    },
+                           "apk_sha256":  "f0dc7a8dcf4ddae0c764d164622c65a5992d580507226efa7eaf6f8923bdce7c"
+                       },
+    "upstream_commits":  {
+                             "linux":  "a90ee4305c4a5df72c11b31dacfdc76e00fcf78a",
+                             "u_boot":  "a6ab6a66146ed0bf1420db0ee858b49005783222",
+                             "arm_trusted_firmware":  "b5de74a685fb73b784e45bbbd18dd9a0c528d8b2",
+                             "emuelec_4_8":  "02b45fe53b85c45c75dbad8e44a648092dec2e72"
+                         },
+    "local_source":  {
+                         "selected_board_source_archive_sha256":  "8fdb49a61ae66ab074571e98d0f437c14caebc527faa325400d2548d17385adc",
+                         "selected_board_source_count":  27,
+                         "final_sdpm_sunxi_mmc_sha256":  "05b30029d76e1afd7ac12ac5b8eb856f3cc4c3f0d6c694e4604174635fdcc490",
+                         "final_kernel_config_sha256":  "e73aeb9a99ae78ac41c3e54bbca8ffc47b900714b128e74f2c04374767cc48d7",
+                         "final_kernel_sha256":  "b482527b4ac808c0bff409859be2a380c682552e06aa85d1ab532246b988f74b",
+                         "emuelec_tracked_patch_sha256":  "d0709c90aced118a2a1980808f99ebec81d95225893e7a5683cc2415ec140119",
+                         "emuelec_untracked_overlay_count":  13
+                     },
+    "public_paths":  [
+                         "source/h728-selected-board-sources-20261014.tar.gz",
+                         "source/final-sdpm/",
+                         "source/core-build/",
+                         "source/dualboot-rebuild/",
+                         "source/emuelec-4.8/",
+                         "source/FORMAL_BUILD_MANIFEST.json"
+                     ],
+    "scope":  "Exact upstream revisions plus the H728-local modified source snapshots/config/build helpers used by the formal images. No ROMs or BIOS are included."
+}

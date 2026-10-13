@@ -61,19 +61,19 @@ Only the original device combination has direct compatibility evidence. Other H7
 
 ## Support the author
 
-If this project helped you, voluntary support is welcome.
+If this project has been helpful, you can support its independent development.
 
-**International:** [Buy Me a Coffee](https://buymeacoffee.com/SkillGodAK)
+**International donations:**
 
-[![Buy Me a Coffee](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-buymeacoffee.svg)](https://buymeacoffee.com/SkillGodAK)
+<a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
-**Bank QR:**
+**Bank donation:**
 
-![Bank donation QR](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-bank.jpg)
+<img src="assets/donate-bank.jpg" alt="Bank donation QR code" width="180">
 
-**WeChat QR:**
+**WeChat donation:**
 
-![WeChat donation QR](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-wechat.jpg)
+<img src="assets/donate-wechat.jpg" alt="WeChat donation QR code" width="180">
 
 ---
 

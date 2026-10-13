@@ -64,21 +64,21 @@
 - 按照不同 SD 卡容量，首次 EEROMS 擴容時間可能不同。勿中斷；若有錯誤，請保留畫面和日誌回報。
 - 本專案不是 EmuELEC／裝置品牌官方發行版；商標與上游成果歸各自權利人所有。
 
-## 支持作者
+## 贊助作者
 
 如果這個專案對你有幫助，歡迎自願支持獨立開發者。
 
-**海外贊助：** [Buy Me a Coffee](https://buymeacoffee.com/SkillGodAK)
+**國外贊助：**
 
-[![Buy Me a Coffee](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-buymeacoffee.svg)](https://buymeacoffee.com/SkillGodAK)
+<a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
-**銀行贊助：**
+**銀行收款：**
 
-![銀行贊助 QR Code](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-bank.jpg)
+<img src="assets/donate-bank.jpg" alt="銀行贊助 QR Code" width="180">
 
 **微信收款：**
 
-![微信贊助 QR Code](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-wechat.jpg)
+<img src="assets/donate-wechat.jpg" alt="微信贊助 QR Code" width="180">
 
 ---
 

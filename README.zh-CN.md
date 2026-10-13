@@ -49,21 +49,21 @@
 
 本项目不提供游戏 ROM、BIOS 或原厂 Android 映像；不保证其他 H728 盒子、第三方遥控器或非原厂 Android 的兼容性。Root 版需要现有 Android `su`，不负责获取 ROOT。此项目不是 EmuELEC 或盒子厂商的官方作品。
 
-## 支持作者
+## 赞助作者
 
-如果项目对你有帮助，欢迎自愿赞助：
+如果这个项目对你有帮助，欢迎自愿支持独立开发者。
 
-**海外赞助：** [Buy Me a Coffee](https://buymeacoffee.com/SkillGodAK)
+**海外赞助：**
 
-[![Buy Me a Coffee](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-buymeacoffee.svg)](https://buymeacoffee.com/SkillGodAK)
+<a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
 **银行收款：**
 
-![银行赞助 QR Code](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-bank.jpg)
+<img src="assets/donate-bank.jpg" alt="银行赞助二维码" width="180">
 
 **微信收款：**
 
-![微信收款 QR Code](https://raw.githubusercontent.com/SkillGodAk/DRO/main/assets/donate-wechat.jpg)
+<img src="assets/donate-wechat.jpg" alt="微信收款二维码" width="180">
 
 ---
 

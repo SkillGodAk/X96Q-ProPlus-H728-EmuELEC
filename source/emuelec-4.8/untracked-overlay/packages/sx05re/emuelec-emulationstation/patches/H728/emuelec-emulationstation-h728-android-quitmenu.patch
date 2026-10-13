@@ -1,0 +1,70 @@
+--- a/es-app/src/guis/GuiMenu.cpp
++++ b/es-app/src/guis/GuiMenu.cpp
+@@ -5572,14 +5572,14 @@
+ 
+ #endif
+ 
+ 	if (quickAccessMenu)
+ 		s->addGroup(_("QUIT"));
+ 
+-	s->addEntry(_("RESTART SYSTEM"), false, [window] {
+-		window->pushGui(new GuiMsgBox(window, _("REALLY RESTART?"), 
++	s->addEntry(_("RESTART EMUELEC"), false, [window] {
++		window->pushGui(new GuiMsgBox(window, _("REALLY RESTART EMUELEC?"), 
+ 			_("YES"), [] { Utils::Platform::quitES(Utils::Platform::QuitMode::REBOOT); },
+ 			_("NO"), nullptr));
+ 	}, "iconRestart");
+ 
+ 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::SUSPEND))
+ 	{
+--- a/locale/lang/zh_TW/LC_MESSAGES/emulationstation2.po
++++ b/locale/lang/zh_TW/LC_MESSAGES/emulationstation2.po
+@@ -2101,17 +2101,17 @@
+ msgid "DISABLE PLANE MODE"
+ msgstr "停用飛行模式"
+ 
+ msgid "ENABLE PLANE MODE"
+ msgstr "啟用飛行模式"
+ 
+-msgid "RESTART SYSTEM"
+-msgstr "重新啟動系統"
+-
+-msgid "REALLY RESTART?"
+-msgstr "確定要重新啟動嗎?"
++msgid "RESTART EMUELEC"
++msgstr "重新啟動 EmuELEC"
++
++msgid "REALLY RESTART EMUELEC?"
++msgstr "確定要重新啟動 EmuELEC？"
+ 
+ msgid "SUSPEND SYSTEM"
+ msgstr "系統休眠"
+ 
+ msgid "REALLY SUSPEND ?"
+ msgstr "確定要休眠？"
+--- a/es-core/src/guis/GuiInputConfig.cpp
++++ b/es-core/src/guis/GuiInputConfig.cpp
+@@ -442,15 +442,22 @@
+ }
+ 
+ bool GuiInputConfig::assign(Input input, int inputId)
+ {
+ 	// input is from InputConfig* mTargetConfig
+ 
++	// H728 ShanWan Twin USB Joystick 2563:0555 exposes overlapping controls during
++	// the mapping wizard. Let this exact device finish the wizard; the H728 on-finish
++	// normalizer rewrites it to D-pad=hat0, left stick=0/1, right stick=2/3.
++	const bool h728TwinUsb =
++		mTargetConfig->getDeviceName() == "Twin USB Joystick" &&
++		mTargetConfig->getDeviceGUIDString() == "0300ef68632500005505000011010000";
++
+ 	// if this input is mapped to something other than "nothing" or the current row, error
+ 	// (if it's the same as what it was before, allow it)
+-	if (mTargetConfig->getMappedTo(input).size() > 0 && 
++	if (!h728TwinUsb && mTargetConfig->getMappedTo(input).size() > 0 && 
+ 		!mTargetConfig->isMappedTo(GUI_INPUT_CONFIG_LIST[inputId].name, input) && 
+ #ifdef _ENABLEEMUELEC		
+         GUI_INPUT_CONFIG_LIST[inputId].name != "HotKeyEnable") // emuelec
+ #else
+ 		GUI_INPUT_CONFIG_LIST[inputId].name != "hotkey") 
+ #endif

@@ -1,0 +1,122 @@
+diff --git a/src/video/kmsdrm/SDL_kmsdrmvideo.c b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+index 8f080c2..058cd29 100644
+--- a/src/video/kmsdrm/SDL_kmsdrmvideo.c
++++ b/src/video/kmsdrm/SDL_kmsdrmvideo.c
+@@ -51,6 +51,7 @@
+ #include <dirent.h>
+ #include <poll.h>
+ #include <errno.h>
++#include <stdio.h>
+ 
+ #ifdef __OpenBSD__
+ static SDL_bool moderndri = SDL_FALSE;
+@@ -711,6 +712,26 @@ static SDL_bool KMSDRM_CrtcGetVrr(uint32_t drm_fd, uint32_t crtc_id)
+     return SDL_FALSE;
+ }
+ 
++/* H728/EmuELEC: selected DRM mode index shared by SDL and RetroArch.
++   Missing or invalid state means "use normal SDL KMSDRM selection". */
++static int KMSDRM_GetConfiguredModeIndex(drmModeConnector *connector)
++{
++    FILE *fd;
++    int mode_index = -1;
++
++    fd = fopen("/var/run/drmMode", "r");
++    if (fd) {
++        int configured_index;
++        if (fscanf(fd, "%d", &configured_index) == 1 &&
++            configured_index >= 0 && configured_index < connector->count_modes) {
++            mode_index = configured_index;
++        }
++        fclose(fd);
++    }
++
++    return mode_index;
++}
++
+ /* Gets a DRM connector, builds an SDL_Display with it, and adds it to the
+    list of SDL Displays in _this->displays[]  */
+ static void KMSDRM_AddDisplay(_THIS, drmModeConnector *connector, drmModeRes *resources)
+@@ -810,22 +831,28 @@ static void KMSDRM_AddDisplay(_THIS, drmModeConnector *connector, drmModeRes *re
+         goto cleanup;
+     }
+ 
+-    /* Find the index of the mode attached to this CRTC */
+-    mode_index = -1;
++    /* H728: select the validated mode index, but do not modeset yet.
++       SDL will create a GBM framebuffer at the target size and perform the
++       actual drmModeSetCrtc() on the first SwapWindow(). This avoids pairing
++       a new mode with the old console framebuffer ID. */
++    mode_index = KMSDRM_GetConfiguredModeIndex(connector);
+ 
+-    for (i = 0; i < connector->count_modes; i++) {
+-        drmModeModeInfo *mode = &connector->modes[i];
++    if (mode_index == -1) {
++        /* Find the index of the mode attached to this CRTC. */
++        for (i = 0; i < connector->count_modes; i++) {
++            drmModeModeInfo *mode = &connector->modes[i];
+ 
+-        if (!SDL_memcmp(mode, &crtc->mode, sizeof(crtc->mode))) {
+-            mode_index = i;
+-            break;
++            if (!SDL_memcmp(mode, &crtc->mode, sizeof(crtc->mode))) {
++                mode_index = i;
++                break;
++            }
+         }
+     }
+ 
+     if (mode_index == -1) {
+         int current_area, largest_area = 0;
+ 
+-        /* Find the preferred mode or the highest resolution mode */
++        /* Find the preferred mode or the highest resolution mode. */
+         for (i = 0; i < connector->count_modes; i++) {
+             drmModeModeInfo *mode = &connector->modes[i];
+ 
+@@ -840,9 +867,6 @@ static void KMSDRM_AddDisplay(_THIS, drmModeConnector *connector, drmModeRes *re
+                 largest_area = current_area;
+             }
+         }
+-        if (mode_index != -1) {
+-            crtc->mode = connector->modes[mode_index];
+-        }
+     }
+ 
+     if (mode_index == -1) {
+@@ -858,12 +882,11 @@ static void KMSDRM_AddDisplay(_THIS, drmModeConnector *connector, drmModeRes *re
+     /* Part 1: setup the SDL_Display driverdata. */
+     /*********************************************/
+ 
+-    /* Get the mode currently setup for this display,
+-       which is the mode currently setup on the CRTC
+-       we found for the active connector. */
+-    dispdata->mode = crtc->mode;
++    /* Preserve the actual pre-SDL CRTC mode for clean teardown, while using
++       the validated connector mode as SDL's desktop/fullscreen target. */
+     dispdata->original_mode = crtc->mode;
+-    dispdata->fullscreen_mode = crtc->mode;
++    dispdata->mode = connector->modes[mode_index];
++    dispdata->fullscreen_mode = connector->modes[mode_index];
+ 
+     if (dispdata->mode.hdisplay == 0 || dispdata->mode.vdisplay == 0) {
+         ret = SDL_SetError("Couldn't get a valid connector videomode.");
+@@ -1354,10 +1377,17 @@ void KMSDRM_GetDisplayModes(_THIS, SDL_VideoDisplay *display)
+     SDL_DisplayData *dispdata = display->driverdata;
+     drmModeConnector *conn = dispdata->connector;
+     SDL_DisplayMode mode;
++    int wanted_mode = KMSDRM_GetConfiguredModeIndex(conn);
+     int i;
+ 
+     for (i = 0; i < conn->count_modes; i++) {
+-        SDL_DisplayModeData *modedata = SDL_calloc(1, sizeof(SDL_DisplayModeData));
++        SDL_DisplayModeData *modedata;
++
++        if (wanted_mode >= 0 && i != wanted_mode) {
++            continue;
++        }
++
++        modedata = SDL_calloc(1, sizeof(SDL_DisplayModeData));
+ 
+         if (modedata) {
+             modedata->mode_index = i;

@@ -1,0 +1,15 @@
+--- a/es-app/src/FileData.cpp
++++ b/es-app/src/FileData.cpp
+@@ -741,9 +741,10 @@ bool FileData::launchGame(Window* window, LaunchGameOptions options)
+ 	VolumeControl::getInstance()->deinit();
+ 
+ 	bool hideWindow = Settings::getInstance()->getBool("HideWindow");
+ #ifdef _ENABLEEMUELEC
+-	// attempts to fix screen tearing issue, we always need hideWindow to false
+-	hideWindow = false;
++	// H728 uses mainline DRM/KMS; fully release SDL/DRM before the emulator
++	// takes KMS master, then reinitialize EmulationStation on return.
++	hideWindow = true;
+ #endif
+ 	window->deinit(hideWindow);
+ 	

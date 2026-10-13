@@ -1,0 +1,45 @@
+diff --git a/gfx/common/drm_common.c b/gfx/common/drm_common.c
+index 10fb388..064317b 100644
+--- a/gfx/common/drm_common.c
++++ b/gfx/common/drm_common.c
+@@ -14,6 +14,7 @@
+  */
+ 
+ #include <compat/strl.h>
++#include <stdio.h>
+ 
+ #include <retro_miscellaneous.h>
+ 
+@@ -172,6 +173,32 @@ bool drm_get_encoder(int fd)
+             drm_calc_refresh_rate(&g_drm_connector->modes[i]));
+    }
+ 
++   /* H728/EmuELEC: use the same validated DRM mode index as SDL/KMSDRM.
++    * Missing or invalid state leaves RetroArch's normal mode selection intact. */
++   {
++      FILE *fd_drm_mode = fopen("/var/run/drmMode", "r");
++      if (fd_drm_mode)
++      {
++         int mode_index;
++         if (fscanf(fd_drm_mode, "%d", &mode_index) == 1
++               && mode_index >= 0
++               && mode_index < g_drm_connector->count_modes)
++         {
++            drmModeCrtc *crtc = drmModeGetCrtc(fd, g_drm_encoder->crtc_id);
++            if (crtc)
++            {
++               if (drmModeSetCrtc(fd, crtc->crtc_id, crtc->buffer_id,
++                        0, 0, &g_drm_connector->connector_id, 1,
++                        &g_drm_connector->modes[mode_index]) != 0)
++                  RARCH_WARN("[DRM] Failed to apply configured mode index %d.\n",
++                        mode_index);
++               drmModeFreeCrtc(crtc);
++            }
++         }
++         fclose(fd_drm_mode);
++      }
++   }
++
+    return true;
+ }
+ 

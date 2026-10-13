@@ -1,0 +1,72 @@
+{
+    "modified_patch":  "notes/builder-recovery-20261014/EmuELEC-4.8-local-modifications.patch",
+    "overlay":  [
+                    {
+                        "sha256":  "3128f8928f43c1a3d585368052d1f8e3641deb646130758a81ac2d8af89794df",
+                        "file":  "distributions/EmuELEC/splash/H728/splash-1080.png",
+                        "bytes":  2199571
+                    },
+                    {
+                        "sha256":  "e09d5216a8bda4cbfca08e1170d7dae5c9d9c9ff6ed8d215cefd5f02d5d8ee08",
+                        "file":  "packages/multimedia/SDL2/patches/H728/0001-h728-drm-mode-index.patch",
+                        "bytes":  4692
+                    },
+                    {
+                        "sha256":  "688e39748bb63498780de70a42b534a48ea2775c9fc9fe415b2af535e4edebae",
+                        "file":  "packages/sx05re/emuelec-emulationstation/config/h728/01-h728-boot-target.sh",
+                        "bytes":  414
+                    },
+                    {
+                        "sha256":  "d679443dcf55e714626a110649887da5340f513a48f5175a373dcfeabb9ba9b4",
+                        "file":  "packages/sx05re/emuelec-emulationstation/config/h728/rebootfromnand",
+                        "bytes":  1558
+                    },
+                    {
+                        "sha256":  "b871f4e42aac86fafc30db08f11cc9472d3004e01c5fcfbcd3e5f6a5df6e54ab",
+                        "file":  "packages/sx05re/emuelec-emulationstation/config/h728/reboottoemuelec",
+                        "bytes":  1551
+                    },
+                    {
+                        "sha256":  "cd50c2f4e29f19713899fbca44ff7b362b291f0e369ab33bd005a75af587a2d7",
+                        "file":  "packages/sx05re/emuelec-emulationstation/patches/H728/emuelec-emulationstation-h728-android-quitmenu.patch",
+                        "bytes":  2362
+                    },
+                    {
+                        "sha256":  "898727cdb88687101e78339467794708344311cf2bfc588aa73fdefc996f96ea",
+                        "file":  "packages/sx05re/emuelec-emulationstation/patches/H728/emuelec-emulationstation-h728-drm-video-mode.patch",
+                        "bytes":  5637
+                    },
+                    {
+                        "sha256":  "8176c0ee07d97be65b9e8d2d971c384a7ab2660eb364886122088ff052d9da74",
+                        "file":  "packages/sx05re/emuelec-emulationstation/patches/H728/emuelec-emulationstation-h728-release-drm.patch",
+                        "bytes":  591
+                    },
+                    {
+                        "sha256":  "9833a0875cd31d95bd1865ea9b44d508592f28e8887f21c6746bfc98591f3f34",
+                        "file":  "packages/sx05re/emuelec/bin/h728-display-mode",
+                        "bytes":  9487
+                    },
+                    {
+                        "sha256":  "6d877f95c61fb69d19495e50a38517d9849ac05c9ae540b3d05303f017bd7765",
+                        "file":  "packages/sx05re/emuelec/bin/h728-fix-twin-usb-input",
+                        "bytes":  3123
+                    },
+                    {
+                        "sha256":  "b86e14c2bb6050188f214cf107cb949e3447cfc60129ce7fb75a9cdfe77563aa",
+                        "file":  "packages/sx05re/emuelec/gamepads/Twin USB Joystick.cfg",
+                        "bytes":  1056
+                    },
+                    {
+                        "sha256":  "171500ca4ab7af91f149f206de28f054dfb2f57c398457fba3ca84311ed0cf16",
+                        "file":  "packages/sx05re/libretro_base/retroarch/patches/H728/retroarch-h728-drm-mode-index.patch",
+                        "bytes":  1411
+                    },
+                    {
+                        "sha256":  "e7d570d1d377d1862e2825c4adf7020fd2d191403c325ee66f2a12d7555ae8af",
+                        "file":  "packages/sx05re/libretro_base/retroarch/patches/H728/retroarch-h728-fix-kms-master.patch",
+                        "bytes":  1293
+                    }
+                ],
+    "source":  "upstream/EmuELEC-4.8",
+    "upstream_commit":  "02b45fe53b85c45c75dbad8e44a648092dec2e72"
+}

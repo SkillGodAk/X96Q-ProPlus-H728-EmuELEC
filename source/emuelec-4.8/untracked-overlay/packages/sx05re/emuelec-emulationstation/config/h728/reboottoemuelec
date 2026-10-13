@@ -1,0 +1,44 @@
+#!/bin/sh
+# H728 SD-only one-shot EmuELEC reboot switch.
+# Restore only the Allwinner SD BootROM magic on the removable SD.
+# Android/eMMC is never written.
+set -eu
+
+LOG=/storage/.config/h728/reboot-to-emuelec.log
+mkdir -p /storage/.config/h728
+
+FLASH_DEV=$(awk '$2=="/flash" {print $1; exit}' /proc/mounts)
+case "$FLASH_DEV" in
+  /dev/mmcblk*p[0-9]*) SD_DEV=${FLASH_DEV%p*} ;;
+  *) echo "ERROR: cannot resolve SD block device from /flash: $FLASH_DEV" >> "$LOG"; exit 1 ;;
+esac
+
+[ -b "$SD_DEV" ] || { echo "ERROR: not a block device: $SD_DEV" >> "$LOG"; exit 1; }
+
+python3 - "$SD_DEV" "eGON.BT0" "$LOG" <<'PY'
+import os, sys, time
+dev, target, log = sys.argv[1:4]
+offset = 8196
+allowed = {b"eGON.BT0", b"eGON.OFF"}
+with open(dev, "r+b", buffering=0) as f:
+    f.seek(offset)
+    cur = f.read(8)
+    if cur not in allowed:
+        with open(log, "a", encoding="utf-8") as out:
+            out.write(f"ERROR: unexpected SD boot magic {cur!r}; refusing raw write\n")
+        raise SystemExit(1)
+    if cur != target.encode("ascii"):
+        f.seek(offset)
+        n = f.write(target.encode("ascii"))
+        if n != 8:
+            raise OSError(f"short write: {n}")
+        os.fsync(f.fileno())
+    f.seek(offset)
+    new = f.read(8)
+if new != target.encode("ascii"):
+    with open(log, "a", encoding="utf-8") as out:
+        out.write(f"ERROR: verification failed after write: {new!r}\n")
+    raise SystemExit(1)
+with open(log, "a", encoding="utf-8") as out:
+    out.write(f"{time.strftime('%F %T')} EmuELEC reboot armed on {dev}; magic={target}\n")
+PY

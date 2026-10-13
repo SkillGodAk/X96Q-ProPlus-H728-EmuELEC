@@ -1,0 +1,16 @@
+version: 3.0.3
+apkFileName: H728-GameSwitch.apk
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: 21
+  targetSdkVersion: 28
+versionInfo:
+  versionCode: 1
+  versionName: 1.0
+resourcesInfo:
+  packageId: 0
+  packageName: com.skillgod.h728gameswitch
+doNotCompress:
+- arsc

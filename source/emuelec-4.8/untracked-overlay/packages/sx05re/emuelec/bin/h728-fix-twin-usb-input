@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# H728-only normalizer for ShanWan Twin USB Joystick 2563:0555.
+# Fixes the EmulationStation mapper conflict where D-pad consumes X/Y axes
+# and analog rows become "ALREADY TAKEN". Only the exact H728 Twin device is touched.
+
+from pathlib import Path
+import re
+import sys
+
+NAME = "Twin USB Joystick"
+GUID = "0300ef68632500005505000011010000"
+
+BLOCK = """\t<inputConfig type="joystick" deviceName="Twin USB Joystick" deviceGUID="0300ef68632500005505000011010000">
+\t\t<input name="a" type="button" id="1" value="1" />
+\t\t<input name="b" type="button" id="2" value="1" />
+\t\t<input name="hotkeyenable" type="button" id="8" value="1" />
+\t\t<input name="leftshoulder" type="button" id="4" value="1" />
+\t\t<input name="leftthumb" type="button" id="10" value="1" />
+\t\t<input name="lefttrigger" type="button" id="6" value="1" />
+\t\t<input name="rightshoulder" type="button" id="5" value="1" />
+\t\t<input name="rightthumb" type="button" id="11" value="1" />
+\t\t<input name="righttrigger" type="button" id="7" value="1" />
+\t\t<input name="select" type="button" id="8" value="1" />
+\t\t<input name="start" type="button" id="9" value="1" />
+\t\t<input name="x" type="button" id="0" value="1" />
+\t\t<input name="y" type="button" id="3" value="1" />
+\t\t<input name="up" type="hat" id="0" value="1" />
+\t\t<input name="right" type="hat" id="0" value="2" />
+\t\t<input name="down" type="hat" id="0" value="4" />
+\t\t<input name="left" type="hat" id="0" value="8" />
+\t\t<input name="leftanalogup" type="axis" id="1" value="-1" />
+\t\t<input name="leftanalogdown" type="axis" id="1" value="1" />
+\t\t<input name="leftanalogleft" type="axis" id="0" value="-1" />
+\t\t<input name="leftanalogright" type="axis" id="0" value="1" />
+\t\t<input name="rightanalogup" type="axis" id="3" value="-1" />
+\t\t<input name="rightanalogdown" type="axis" id="3" value="1" />
+\t\t<input name="rightanalogleft" type="axis" id="2" value="-1" />
+\t\t<input name="rightanalogright" type="axis" id="2" value="1" />
+\t</inputConfig>"""
+
+PAT = re.compile(
+    r'\t<inputConfig type="joystick" deviceName="' + re.escape(NAME) +
+    r'" deviceGUID="' + re.escape(GUID) + r'">.*?\t</inputConfig>',
+    re.S,
+)
+
+def normalize(path: Path) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8", errors="strict")
+    if NAME not in text or GUID not in text:
+        return False
+    new, count = PAT.subn(BLOCK, text, count=1)
+    if count != 1:
+        return False
+    if new != text:
+        tmp = path.with_name(path.name + ".h728-new")
+        tmp.write_text(new, encoding="utf-8", newline="\n")
+        tmp.replace(path)
+    return True
+
+changed = False
+for arg in sys.argv[1:]:
+    changed = normalize(Path(arg)) or changed
+
+if not sys.argv[1:]:
+    for p in (
+        Path("/storage/.config/emulationstation/es_input.cfg"),
+        Path("/storage/.emulationstation/es_input.cfg"),
+        Path("/storage/.config/emulationstation/es_temporaryinput.cfg"),
+        Path("/storage/.emulationstation/es_temporaryinput.cfg"),
+    ):
+        changed = normalize(p) or changed
+
+sys.exit(0)

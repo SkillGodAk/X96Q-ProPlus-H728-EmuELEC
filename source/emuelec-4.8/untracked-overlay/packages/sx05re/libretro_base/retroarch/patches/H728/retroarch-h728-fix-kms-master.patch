@@ -1,0 +1,47 @@
+--- a/gfx/drivers_context/drm_ctx.c
++++ b/gfx/drivers_context/drm_ctx.c
+@@ -29,6 +29,7 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <poll.h>
++#include <errno.h>
+ 
+ #include <libdrm/drm.h>
+ #include <gbm.h>
+@@ -757,7 +758,14 @@
+       drm->fb_height = g_drm_connector->modes[0].vdisplay;
+    }
+ 
+-   drmSetMaster(g_drm_fd);
++   /*
++    * free_drm_resources() resets g_drm_fd before each probe attempt.
++    * Acquire DRM master on the descriptor we just opened, not on -1.
++    */
++   g_drm_fd = fd;
++   if (drmSetMaster(g_drm_fd) < 0)
++      RARCH_WARN("[KMS] drmSetMaster failed: errno=%d (%s).\n",
++            errno, strerror(errno));
+ 
+    drm->gbm_dev      = gbm_create_device(fd);
+ 
+@@ -774,8 +782,6 @@
+    g_drm_fds.events               = POLLIN;
+    g_drm_evctx.version            = DRM_EVENT_CONTEXT_VERSION;
+    g_drm_evctx.page_flip_handler  = drm_flip_handler;
+-
+-   g_drm_fd                       = fd;
+ 
+    video_driver_display_type_set(RARCH_DISPLAY_KMS);
+ 
+@@ -909,7 +915,11 @@
+ 
+    if ((ret  = drmModeSetCrtc(g_drm_fd,
+          g_crtc_id, fb->fb_id, 0, 0, &g_connector_id, 1, g_drm_mode)) < 0)
++   {
++      RARCH_ERR("[KMS] drmModeSetCrtc failed: ret=%d errno=%d (%s).\n",
++            ret, errno, strerror(errno));
+       goto error;
++   }
+ 
+    return true;
+ 

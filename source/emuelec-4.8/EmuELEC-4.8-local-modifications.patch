@@ -1,0 +1,362 @@
+diff --git a/packages/multimedia/SDL2/package.mk b/packages/multimedia/SDL2/package.mk
+index ff6f307..a830b6c 100644
+--- a/packages/multimedia/SDL2/package.mk
++++ b/packages/multimedia/SDL2/package.mk
+@@ -79,6 +79,11 @@ case "${DEVICE}" in
+       }
+     fi
+   ;;
++  'H728')
++    PKG_PATCH_DIRS="H728"
++    PKG_CMAKE_OPTS_TARGET+=" -DSDL_KMSDRM=ON"
++    PKG_DEPENDS_TARGET+=" libdrm"
++  ;;
+ esac
+ 
+ 
+diff --git a/packages/sx05re/emuelec-emulationstation/package.mk b/packages/sx05re/emuelec-emulationstation/package.mk
+index 0d29e00..07e19aa 100644
+--- a/packages/sx05re/emuelec-emulationstation/package.mk
++++ b/packages/sx05re/emuelec-emulationstation/package.mk
+@@ -24,6 +24,12 @@ if [[ ${DEVICE} == "OdroidM1"  ]] || [[ ${DEVICE} == "RK356x"  ]]; then
+ 	PKG_PATCH_DIRS="Rockchip"
+ fi
+ 
++# H728 uses the mainline DRM/KMS display stack and must fully release SDL/DRM
++# before RetroArch takes KMS master. Apply the H728-specific handoff fix.
++if [[ ${DEVICE} == "H728" ]]; then
++	PKG_PATCH_DIRS="H728"
++fi
++
+ # themes for Emulationstation
+ PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} Crystal"
+ 
+@@ -83,6 +89,14 @@ makeinstall_target() {
+ 	cp -rf ${PKG_DIR}/config/scripts ${INSTALL}/usr/config/emulationstation
+ 	cp -rf ${PKG_DIR}/config/*.cfg ${INSTALL}/usr/config/emulationstation
+ 
++	if [[ ${DEVICE} == "H728" ]]; then
++		cp -f ${PKG_DIR}/config/h728/01-h728-boot-target.sh ${INSTALL}/usr/config/emulationstation/scripts/combined/01-h728-boot-target.sh
++		cp -f ${PKG_DIR}/config/h728/reboottoemuelec ${INSTALL}/usr/bin/reboottoemuelec
++		cp -f ${PKG_DIR}/config/h728/rebootfromnand ${INSTALL}/usr/bin/rebootfromnand
++		chmod +x ${INSTALL}/usr/config/emulationstation/scripts/combined/01-h728-boot-target.sh
++		chmod +x ${INSTALL}/usr/bin/reboottoemuelec ${INSTALL}/usr/bin/rebootfromnand
++	fi
++
+ 	# Generate es_systems.cfg from json
+ 	python3 ${PKG_DIR}/generate_es_systems.py -i ${PKG_DIR}/config/es_systems.json -o ${INSTALL}/usr/config/emulationstation/es_systems.cfg -b manufacturer
+ 
+diff --git a/packages/sx05re/emuelec/bin/batocera/batocera-wifi b/packages/sx05re/emuelec/bin/batocera/batocera-wifi
+index 71d04eb..efb20b5 100755
+--- a/packages/sx05re/emuelec/bin/batocera/batocera-wifi
++++ b/packages/sx05re/emuelec/bin/batocera/batocera-wifi
+@@ -16,7 +16,10 @@ do_list() {
+     connmanctl services | while read; do
+         if [[ $REPLY == *'wifi_'* ]]; then
+           WITHOUT_PREFIX=${REPLY:4}
+-          echo $(remove_last_word $WITHOUT_PREFIX)
++          SSID=$(remove_last_word $WITHOUT_PREFIX)
++          if [[ $SSID =~ [^[:space:]] ]]; then
++            printf '%s\n' "$SSID"
++          fi
+         fi
+     done
+ }
+diff --git a/packages/sx05re/emuelec/bin/batocera/emuelec-bluetooth b/packages/sx05re/emuelec/bin/batocera/emuelec-bluetooth
+index 0558516..1e3460d 100644
+--- a/packages/sx05re/emuelec/bin/batocera/emuelec-bluetooth
++++ b/packages/sx05re/emuelec/bin/batocera/emuelec-bluetooth
+@@ -216,7 +216,7 @@ class BluetoothCTL:
+ 
+     def pair(self, dev: BluetoothDevice) -> bool:
+         return "successful" in ShellIO.execute_lookup(
+-            ["bluetoothctl", "pair", dev.mac], "Pairing successful"
++            ["bluetoothctl", "--agent", "NoInputNoOutput", "pair", dev.mac], "Pairing successful"
+         )
+ 
+     def disconnect(self, dev: BluetoothDevice) -> bool:
+@@ -254,13 +254,16 @@ def on_device_discovered(dev: BluetoothDevice) -> bool:
+         return True
+     
+ 
++    if dev.icon.startswith("audio-"):
++        ShellIO.execute(["systemctl", "start", "pulseaudio"], debug=False)
++
+     if (dev.trusted and dev.paired and not dev.connected and bt.connect(dev)):
+         return True
+ 
+     if (
+         not dev.connected  # exclude already connected devices
+         and dev.rssi != 0  # exclude inactive devices (saved)
+-        and "input-" in dev.icon  # exclude any non-input device
++        and ("input-" in dev.icon or dev.icon.startswith("audio-"))
+     ):
+         print(
+             "found device {}, mac: {}, icon: {}, paired: {}".format(
+diff --git a/packages/sx05re/emuelec/bin/check_res.sh b/packages/sx05re/emuelec/bin/check_res.sh
+index 6406dbf..095dedb 100644
+--- a/packages/sx05re/emuelec/bin/check_res.sh
++++ b/packages/sx05re/emuelec/bin/check_res.sh
+@@ -7,37 +7,88 @@
+ # Source predefined functions and variables
+ . /etc/profile
+ 
+-# DO NOT modify this file. 
++# DO NOT modify this file.
+ 
+ # It seems some slow SDcards have a problem creating the symlink on time :/
+ CONFIG_FLASH="/flash/config.ini"
+ VIDEO_FILE="/storage/.config/EE_VIDEO_MODE"
+ VIDEO_MODE="/sys/class/display/mode"
+ 
++is_h728=false
++if [[ "$EE_DEVICE" == "H728" ]] || grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null; then
++  is_h728=true
++fi
++
+ 
+ 
+-# If the video-mode is contained in flash config.
++# Select the video mode. H728 must not inherit the legacy Amlogic vout
++# priority: a leftover /flash/config.ini vout can silently pin HDMI to 1080p
++# and override EmulationStation's newly selected Auto/DRM resolution.
+ DEFE=""
++if ${is_h728}; then
++  # H728's ES setting is authoritative. The external file remains a fallback
++  # for first boot / systems without an ES setting; it cannot mask a UI change.
++  DEFE=$(get_ee_setting ee_videomode)
++  if [[ -z "${DEFE}" && -f "${VIDEO_FILE}" ]]; then
++    DEFE=$(cat "${VIDEO_FILE}")
++  fi
++  [[ "${DEFE}" == "Custom" ]] && DEFE="auto"
++else
++  # Preserve the original Amlogic/other-platform setting priority exactly.
++  if [ -z "${DEFE}" ]; then
++    CFG_VAL=$(get_config_value "${CONFIG_FLASH}" "vout")
++    if [[ ! -z "${CFG_VAL}" ]]; then
++      DEFE="${CFG_VAL}"
++    fi
++  fi
+ 
+-# FLASH CONFIG hdmimode takes priority 1.
+-if [ -z "${DEFE}" ]; then
+-  CFG_VAL=$(get_config_value "${CONFIG_FLASH}" "vout")
+-  if [[ ! -z "${CFG_VAL}" ]]; then
+-    DEFE="${CFG_VAL}"
++  if [[ -z "${DEFE}" && -f "${VIDEO_FILE}" ]]; then
++    DEFE=$(cat ${VIDEO_FILE})
+   fi
+-fi
+ 
+-# Check for EE_VIDEO_MODE override 2nd.
+-if [[ -z "${DEFE}" && -f "${VIDEO_FILE}" ]]; then
+-  DEFE=$(cat ${VIDEO_FILE})
++  if [ -z "${DEFE}" ]; then
++    DEFE=$(get_ee_setting ee_videomode)
++    if [ "${DEFE}" == "Custom" ]; then
++      DEFE=$(cat ${VIDEO_MODE})
++    fi
++  fi
+ fi
+ 
+-# 3rd check ES for it's preferred resolution.
+-if [ -z "${DEFE}" ]; then
+-  DEFE=$(get_ee_setting ee_videomode)
+-  if [ "${DEFE}" == "Custom" ]; then
+-      DEFE=$(cat ${VIDEO_MODE})
++# H728 uses a platform-specific DRM/KMS backend, just as H3 uses h3disp.
++# The default entry contains no hardcoded video= mode. On every boot, auto or
++# the user's ee_videomode is validated against HDMI and exported as a DRM mode
++# index for patched SDL/KMSDRM and RetroArch. No /flash write or reboot needed.
++if ${is_h728}; then
++  [[ -z "${DEFE}" ]] && DEFE="auto"
++
++  H728_MODE_OUT=$(h728-display-mode set "${DEFE}" 2>>/emuelec/logs/h728-display-mode.log)
++  H728_MODE_RC=$?
++
++  # A saved mode may be valid on the previous TV but not on the newly
++  # connected one. Keep the user's saved preference, but use Auto for this
++  # boot rather than falling back to SDL's largest-mode heuristic.
++  if [ "${H728_MODE_RC}" -ne 0 ] && [ "${DEFE}" != "auto" ]; then
++    echo "H728 display backend rejected '${DEFE}' rc=${H728_MODE_RC}; trying auto" >> /emuelec/logs/h728-display-mode.log
++    H728_MODE_OUT=$(h728-display-mode set auto 2>>/emuelec/logs/h728-display-mode.log)
++    H728_MODE_RC=$?
+   fi
++
++  if [ "${H728_MODE_RC}" -ne 0 ]; then
++    rm -f /var/run/drmMode
++    echo "H728 display backend could not resolve a safe mode; using stock KMS fallback" >> /emuelec/logs/h728-display-mode.log
++    exit 0
++  fi
++
++  case "${H728_MODE_OUT}" in
++    H728_MODE_SET=*)
++      exit 0
++      ;;
++    *)
++      rm -f /var/run/drmMode
++      echo "H728 display backend returned unexpected output: ${H728_MODE_OUT}; using stock KMS fallback" >> /emuelec/logs/h728-display-mode.log
++      exit 0
++      ;;
++  esac
+ fi
+ 
+ # Set video mode, this has to be done before starting ES
+diff --git a/packages/sx05re/emuelec/bin/emuelec-utils b/packages/sx05re/emuelec/bin/emuelec-utils
+index 76c1a51..fc4da2c 100755
+--- a/packages/sx05re/emuelec/bin/emuelec-utils
++++ b/packages/sx05re/emuelec/bin/emuelec-utils
+@@ -317,6 +317,15 @@ function resolutions() {
+ # Returns a list of supported resolutions depending on device
+ 	RESOLUTIONS=()
+ 
++  # H728 uses mainline DRM/KMS. Do not use the Amlogic /sys/class/display
++  # compatibility interface; expose only modes accepted by the live connector.
++  if [[ "$EE_DEVICE" == "H728" ]] || grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null; then
++    mapfile -t RESOLUTIONS < <(/usr/bin/h728-display-mode list)
++    IFS=","
++    echo "${RESOLUTIONS[*]}"
++    return
++  fi
++
+   if [ -f "/storage/LEGACY_RESOLUTIONS" ]; then
+     # N2 supported resolutions source : https://wiki.odroid.com/odroid-n2/application_note/software/set_display_mode
+     N2_SUPPORTED_RESOLUTIONS="480x320p60hz 640x480p60hz 720x480p60hz 720x576p50hz 800x480p60hz 1024x600p60hz 1024x768p60hz 1280x1024p60hz 1280x720p50hz 1280x720p60hz 1280x800p60hz 1360x768p60hz 1440x900p60hz 1600x1200p60hz 1600x900p60hz 1680x1050p60hz 1920x1080p24hz 1920x1080p30hz 1920x1080p50hz 1920x1080p60hz 1920x1200p60hz 2560x1080p60hz 2560x1440p60hz 2560x1600p60hz 3440x1440p60hz 3840x2160p24hz 3840x2160p25hz 3840x2160p30hz 3840x2160p50hz 3840x2160p60hz"
+@@ -462,6 +471,12 @@ function createMultidisc() {
+ 
+ function blank_buffer() {
+ # Clears screen buffer
++  # H728 renders through DRM/KMS, not the legacy Amlogic framebuffer path.
++  # /dev/fb1 does not exist as a device on H728: unbounded dd to that path
++  # creates a regular file that fills /dev devtmpfs and stalls transitions.
++  if grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null; then
++    return 0
++  fi
+   # Blank the buffer.
+   dd if=/dev/zero of=/dev/fb0 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+   dd if=/dev/zero of=/dev/fb1 bs=256K conv=sync,noerror,notrunc > /dev/null 2>&1
+@@ -472,6 +487,12 @@ function init_app_video() {
+ 	local ROMNAME=$2
+ 	local BASEROMNAME=${ROMNAME##*/}
+ 
++  # ES and emulator already own the modeset on H728 DRM/KMS.
++  # The legacy init path assumes /sys/class/display/mode (Amlogic-only).
++  if grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null; then
++    return 0
++  fi
++
+ 	[[ -f "/tmp/EE_LASTVIDEO" ]] && return
+ 
+   blank_buffer
+@@ -505,6 +526,12 @@ function end_app_video() {
+ 	local ROMNAME=$2
+ 	local BASEROMNAME=${ROMNAME##*/}
+ 
++  # Do not run legacy framebuffer clears or Amlogic mode restoration on H728.
++  # EmulationStation restores its DRM/KMS renderer after emulator exit.
++  if grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null; then
++    return 0
++  fi
++
+   [[ ! -f "/tmp/EE_LASTVIDEO" ]] && return
+ 
+ 	if [[ "${PLATFORM}" == "ports" ]] && [[ "${BASEROMNAME}" == "PortMaster.sh" ]]; then 
+diff --git a/packages/sx05re/emuelec/bin/emuelecRunEmu.sh b/packages/sx05re/emuelec/bin/emuelecRunEmu.sh
+index 84c0af7..d80acce 100644
+--- a/packages/sx05re/emuelec/bin/emuelecRunEmu.sh
++++ b/packages/sx05re/emuelec/bin/emuelecRunEmu.sh
+@@ -45,6 +45,15 @@ RACONF="/storage/.config/retroarch/retroarch.cfg"
+ NETPLAY="No"
+ RABIN="retroarch"
+ 
++# The preserved EmuELEC 4.6 user config may contain the old resource-style
++# BIOS path ":/roms/bios". On the native H728/aarch64 RetroArch build this
++# resolves relative to /usr/bin and PCSX-ReARMed falls back to HLE BIOS.
++# Migrate only that legacy value and leave user-selected custom paths alone.
++if grep -aq "sun55i-h728" /proc/device-tree/compatible 2>/dev/null && \
++   grep -q '^system_directory = ":/roms/bios"$' "${RACONF}" 2>/dev/null; then
++    sed -i 's|^system_directory = ":/roms/bios"$|system_directory = "/storage/roms/bios"|' "${RACONF}"
++fi
++
+ init_game
+ 
+ # Make sure the /emuelec/logs directory exists
+diff --git a/packages/sx05re/emuelec/config/emulationstation/scripts/inputconfiguration.sh b/packages/sx05re/emuelec/config/emulationstation/scripts/inputconfiguration.sh
+index d571793..5aac4f5 100755
+--- a/packages/sx05re/emuelec/config/emulationstation/scripts/inputconfiguration.sh
++++ b/packages/sx05re/emuelec/config/emulationstation/scripts/inputconfiguration.sh
+@@ -64,6 +64,14 @@ function inputconfiguration() {
+     local es_conf="${home}/.emulationstation/es_temporaryinput.cfg"
+     declare -A mapping
+ 
++    # H728 ShanWan 2563:0555: normalize the temporary/persistent ES map before
++    # RetroArch autoconfig is generated. This is exact-device-only.
++    if [ -x /storage/.config/h728-bin/h728_fix_twin_usb_input.py ]; then
++        /storage/.config/h728-bin/h728_fix_twin_usb_input.py "${es_conf}" "${home}/.emulationstation/es_input.cfg" || true
++    elif command -v h728-fix-twin-usb-input >/dev/null 2>&1; then
++        h728-fix-twin-usb-input "${es_conf}" "${home}/.emulationstation/es_input.cfg" || true
++    fi
++
+     # check if we have the temporary input file
+     [[ ! -f "${es_conf}" ]] && return
+ 
+diff --git a/packages/sx05re/emuelec/package.mk b/packages/sx05re/emuelec/package.mk
+index 664646e..b89bcd1 100644
+--- a/packages/sx05re/emuelec/package.mk
++++ b/packages/sx05re/emuelec/package.mk
+@@ -83,6 +83,13 @@ makeinstall_target() {
+ 
+ 	mkdir -p ${INSTALL}/usr/config/
+   cp -rf ${PKG_DIR}/config/* ${INSTALL}/usr/config/
++
++  # H728 has a platform DRM/KMS backend. Do not ship a fixed 1080p default;
++  # first boot must derive the mode from the connected display.
++  if [ "${DEVICE}" == "H728" ]; then
++    sed -i 's/^ee_videomode=.*/ee_videomode=auto/' ${INSTALL}/usr/config/emuelec/configs/emuelec.conf\n    # ES runs without /usr/bin/batocera in its service PATH.\n    ln -sf batocera/batocera-wifi ${INSTALL}/usr/bin/batocera-wifi
++  fi
++
+   ln -sf /storage/.config/emuelec ${INSTALL}/emuelec
+ 
+   # Added for compatibility with portmaster
+diff --git a/packages/sx05re/libretro_base/retroarch/package.mk b/packages/sx05re/libretro_base/retroarch/package.mk
+index 12e6906..9f146ae 100644
+--- a/packages/sx05re/libretro_base/retroarch/package.mk
++++ b/packages/sx05re/libretro_base/retroarch/package.mk
+@@ -36,6 +36,11 @@ PKG_DEPENDS_TARGET+=" libdrm librga"
+ PKG_PATCH_DIRS="OdroidGoAdvance"
+ fi
+ 
++if [ "${DEVICE}" == "H728" ]; then
++PKG_DEPENDS_TARGET+=" libdrm"
++PKG_PATCH_DIRS="H728"
++fi
++
+ # Pulseaudio Support
+   if [ "${PULSEAUDIO_SUPPORT}" = yes ]; then
+     PKG_DEPENDS_TARGET+=" pulseaudio"
+@@ -63,7 +68,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-qt \
+                            --enable-sdl2 \
+                            --enable-ffmpeg"
+ 
+-if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ]; then
++if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ] || [ "${DEVICE}" == "RK356x" ] || [ "${DEVICE}" == "OdroidM1" ] || [ "${DEVICE}" == "H728" ]; then
+ PKG_CONFIGURE_OPTS_TARGET+=" --enable-opengles3 \
+                            --enable-opengles3_2 \
+                            --enable-kms \
+@@ -202,6 +207,16 @@ makeinstall_target() {
+   echo "savestates_in_content_dir = \"false\"" >> ${INSTALL}/etc/retroarch.cfg
+   echo "menu_show_restart_retroarch = \"false\"" >> ${INSTALL}/etc/retroarch.cfg
+   echo "menu_show_quit_retroarch = \"true\"" >> ${INSTALL}/etc/retroarch.cfg
++
++if [ "${DEVICE}" == "H728" ]; then
++    # H728 Traditional Chinese menu/OSD font fix.
++    # Use an absolute packaged CJK font path; this RetroArch/Ozone version
++    # does not reliably expand '~' in explicit menu font paths.
++    sed -i -e 's#^user_language = "0"$#user_language = "11"#' ${INSTALL}/etc/retroarch.cfg
++    sed -i -e 's#^video_font_path =.*#video_font_path = "/usr/share/retroarch-assets/pkg/chinese-fallback-font.ttf"#' ${INSTALL}/etc/retroarch.cfg
++    echo 'ozone_font = ""' >> ${INSTALL}/etc/retroarch.cfg
++    echo 'xmb_font = ""' >> ${INSTALL}/etc/retroarch.cfg
++fi
+   
+ if [ "${DEVICE}" == "OdroidGoAdvance" ] || [ "${DEVICE}" == "GameForce" ]; then
+     echo "xmb_layout = 2" >> ${INSTALL}/etc/retroarch.cfg

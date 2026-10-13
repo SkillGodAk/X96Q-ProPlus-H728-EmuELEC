@@ -4,32 +4,32 @@
 
 An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-card images with the Crystal theme, Traditional Chinese defaults, and first-boot FAT32 `EEROMS` game partition setup.
 
-> **Compatibility warning:** Developed and evaluated primarily for the author's **original X96Q Pro+ H728** hardware. Other boxes labeled H728 may use different device trees, remote protocols, power circuits or boot paths. **They have not been verified and are not guaranteed to work.** Back up your SD card before flashing.
+> **Compatibility warning:** Developed and evaluated primarily for the author's **original X96Q Pro+ H728** hardware. Other boxes labeled H728 may use different remotes or boot behavior. **They have not been verified and are not guaranteed to work.** Back up your SD card before flashing.
 
 ## Choose your edition
 
 | Feature | **NoRoot — EmuELEC only** | **Root — Android + EmuELEC** |
 | --- | --- | --- |
 | Default boot | **EmuELEC** | **Original Android** |
-| Android ROOT required? | **No** | **Yes, existing working `su`** |
+| Android ROOT required? | **No** | **Yes, original Android must already be rooted** |
 | Original remote wake after shutdown | **Supported — wakes into EmuELEC** | **Supported — wakes into Android** |
 | GameSwitch APK | Not needed | Required to enter EE from Android |
-| First-boot FAT32 EEROMS expansion | Supported | Supported after entering EE |
-| Crystal / game cores / controller setup | Supported | Supported |
+| Automatic EEROMS game storage | Supported | Supported after entering EE |
+| Crystal / emulators / controller setup | Supported | Supported |
 
 **NoRoot DOES support waking the box with its original IR remote.** It wakes into EmuELEC rather than Android. Both editions have original-remote wake support, with different destinations.
 
-**Special Root edition warning:** Compatibility has been designed and evaluated only for the **original X96Q Pro+ H728, its original Android environment, and its original IR remote**. Root means your existing Android can grant `su` access; this package **does not root Android**. Other H728 devices are untested, including their power management, boot behavior, and infrared remote support.
+**Special Root edition warning:** Compatibility has been designed and evaluated only for the **original X96Q Pro+ H728, its original Android environment, and its original IR remote**. Root requires an already-rooted original Android installation; this package **does not root Android**. Other H728 devices are untested, including their power management, boot behavior, and infrared remote support.
 
-## H728-specific additions over a generic EmuELEC 4.8 setup
+## What's different from a regular EmuELEC 4.8 setup?
 
-- H728 board boot-chain and device-tree integration, including AXP323 cold-start power initialization.
-- Original IR remote shutdown and wake workflows: EE destination on NoRoot and Android destination on Root.
-- Automatic first-boot creation and expansion of the FAT32 `EEROMS` game partition; no repeated formatting on later boots.
-- Crystal theme and Traditional Chinese defaults, system folders, and 43 factory core files (games and BIOS are **not** provided).
-- Android-to-EE switching and tailored reboot routing on the Root edition.
+- **Made ready for X96Q Pro+**: Boot EmuELEC from an SD card without having to figure out the box-specific setup yourself.
+- **Use the original remote to shut down and wake the box**: NoRoot wakes into EmuELEC; Root wakes back into Android.
+- **Game storage sets itself up**: On the first EmuELEC start, the game partition is prepared for your SD card's capacity. Later boots don't repeat the setup.
+- **A familiar interface from the start**: Crystal theme, Traditional Chinese defaults, game folders, and included emulator cores. Bring your own games and any required BIOS files.
+- **Keep Android available**: With Root, use the GameSwitch APK in the original Android system to enter EmuELEC.
 
-These describe this project's board-specific integration, not claims that every listed feature was invented here or absent from upstream EmuELEC 4.8.
+These are conveniences prepared for the X96Q Pro+. Some features may also be available in standard EmuELEC 4.8.
 
 ## Downloads
 

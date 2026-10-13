@@ -4,7 +4,9 @@ This project combines independent board-specific integration with upstream open-
 
 **Distribution requirement:** Before distributing modified GPL-covered kernel or bootloader binaries, make the **complete corresponding source code**, including board-specific modifications, configuration and build scripts needed to regenerate those particular binaries, available under the applicable licenses. A link to unrelated upstream HEAD is not sufficient if the distributed binaries contain local patches.
 
-- Source publication location: **PENDING**. Do not claim the corresponding-source obligation is satisfied until the exact build provenance, patches and downloadable source location are recorded.
+- Published and SHA-verified **partial board source**: [H728 source snapshot and manifest](source/README.md).
+- Published **EmuELEC 4.8 local board modifications**: [H728 EmuELEC 4.8 patches and overlays](source/emuelec-4.8/README.md).
+- **Still pending:** independent validation that these files, upstream revisions and any remaining local modifications comprise the COMPLETE corresponding source and scripts for all GPL-covered binaries in both firmware images. Do not represent the source requirement as finished yet.
 - Build commit hashes and patch lists: **PENDING source audit**.
 - Third-party APK licensing and inclusion must be checked before public distribution.
 

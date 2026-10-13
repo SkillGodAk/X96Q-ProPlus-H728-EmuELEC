@@ -2,9 +2,9 @@
 
 [繁體中文](README.md) · [简体中文](README.zh-CN.md) · [English](README.en.md)
 
-An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-card images with the Crystal theme, Traditional Chinese defaults, and first-boot FAT32 `EEROMS` game partition setup.
+An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean TF-card images with the Crystal theme, Traditional Chinese defaults, and first-boot FAT32 `EEROMS` game partition setup.
 
-> **Compatibility warning:** Developed and evaluated primarily for the author's **original X96Q Pro+ H728** hardware. Other boxes labeled H728 may use different remotes or boot behavior. **They have not been verified and are not guaranteed to work.** Back up your SD card before flashing.
+> **Compatibility warning:** Developed and evaluated primarily for the author's **original X96Q Pro+ H728** hardware. Other boxes labeled H728 may use different remotes or boot behavior. **They have not been verified and are not guaranteed to work.** Back up your TF card before flashing.
 
 ## Choose your edition
 
@@ -26,12 +26,12 @@ An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-car
 
 ## What's different from a regular EmuELEC 4.8 setup?
 
-- **Made ready for X96Q Pro+**: Boot EmuELEC from an SD card without having to figure out the box-specific setup yourself.
+- **Made ready for X96Q Pro+**: Boot EmuELEC from an TF card without having to figure out the box-specific setup yourself.
 - **Use the original remote to shut down and wake the box**: NoRoot wakes into EmuELEC; Root wakes back into Android.
 - **Original remote navigation**: Use Up, Down, Left and Right to move around, with Back and OK to select and return.
 - **Bluetooth support**: Use the Bluetooth connection features built into the system.
 - **Two-controller recognition**: Supports one-to-two gamepad recognition, with controller settings available for both gamepads.
-- **Game storage sets itself up**: On the first EmuELEC start, the game partition is prepared for your SD card's capacity. Later boots don't repeat the setup.
+- **Game storage sets itself up**: On the first EmuELEC start, the game partition is prepared for your TF card's capacity. Later boots don't repeat the setup.
 - **A familiar interface from the start**: Crystal theme, Traditional Chinese defaults, game folders, and included emulator cores. Bring your own games and any required BIOS files.
 - **Keep Android available**: With Root, use the GameSwitch APK in the original Android system to enter EmuELEC.
 
@@ -49,15 +49,15 @@ The two 7z files each extract to a 4 GiB IMG. Check the release checksums before
 
 ## Installation
 
-1. Back up your SD card. Use 7-Zip to extract the **IMG** from the 7z archive.
-2. Flash the IMG to the **correct SD card** using [balenaEtcher](https://etcher.balena.io/), then let verification finish. Never target your computer drive or the box's Android eMMC.
+1. Back up your TF card. Use 7-Zip to extract the **IMG** from the 7z archive.
+2. Flash the IMG to the **correct TF card** using [balenaEtcher](https://etcher.balena.io/), then let verification finish. Never target your computer drive or the box's Android eMMC.
 3. Power the box down and insert the card. NoRoot boots into EmuELEC. Root boots original Android first; on an already-rooted Android installation, install GameSwitch APK, grant the requested `su` permission, and use it to enter EE.
 4. The first EE boot initializes the FAT32 `EEROMS` partition and factory files. **Do not unplug or reset during progress or expansion.**
 5. Later boots must not reformat an existing EEROMS.
 
 ## Adding games
 
-Once setup finishes, connect the SD card to a computer and open the FAT32 **`EEROMS`** partition. Put your legally obtained games into the appropriate per-system `roms` directories (for example `roms/nes`, `roms/snes`, or `roms/psx`; follow the folders actually present on your card). Some systems need compatible BIOS files, which you must provide legally and place in the relevant `bios` directory. Eject the card safely, return to EE, and refresh the game list. Preserve your saves and configuration.
+Once setup finishes, connect the TF card to a computer and open the FAT32 **`EEROMS`** partition. Put your legally obtained games into the appropriate per-system `roms` directories (for example `roms/nes`, `roms/snes`, or `roms/psx`; follow the folders actually present on your card). Some systems need compatible BIOS files, which you must provide legally and place in the relevant `bios` directory. Eject the card safely, return to EE, and refresh the game list. Preserve your saves and configuration.
 
 ## Important limitations
 

@@ -37,7 +37,7 @@ An EmuELEC 4.8 integration for the **X96Q Pro+ (H728)** TV box. Two clean SD-car
 
 ## Downloads
 
-Release files are still being uploaded and verified. Once the release is published, download them from [GitHub Releases](../../releases):
+Download the latest release from [GitHub Releases](../../releases):
 
 | File | Purpose |
 | --- | --- |

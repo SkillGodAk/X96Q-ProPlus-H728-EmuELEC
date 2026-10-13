@@ -37,7 +37,7 @@
 
 ## 下载与安装
 
-正式版文件仍在上传与检查；正式发布完成后，从 [GitHub Releases](../../releases) 下载：`X96Q pro+_H728_EmuELEC_4.8_NoRoot.7z`（纯 EE）、`X96Q pro+_H728_EmuELEC_4.8_Root.7z`（Android＋EE）以及仅供 Root 版使用的 `H728-GameSwitch.apk`。每个压缩包解压后都是 4 GiB 的 IMG。
+请从 [GitHub Releases](../../releases) 下载最新正式版：`X96Q pro+_H728_EmuELEC_4.8_NoRoot.7z`（纯 EE）、`X96Q pro+_H728_EmuELEC_4.8_Root.7z`（Android＋EE）以及仅供 Root 版使用的 `H728-GameSwitch.apk`。每个压缩包解压后都是 4 GiB 的 IMG。
 
 1. 备份 SD 卡，用 7-Zip 解压 `.7z`，获得 `.img`。
 2. 使用 [balenaEtcher](https://etcher.balena.io/) 选择 IMG 和正确 SD 卡，烧录并完成验证。**不要选择电脑系统盘或 Android eMMC。**

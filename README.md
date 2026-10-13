@@ -37,7 +37,7 @@
 
 ## 下載
 
-正式版附件目前仍在上傳與檢查；完成正式發布後，請從 [**GitHub Releases**](../../releases) 下載並解壓 IMG：
+請從 [**GitHub Releases**](../../releases) 下載最新正式版並解壓 IMG：
 
 | 檔案 | 內容 |
 | --- | --- |

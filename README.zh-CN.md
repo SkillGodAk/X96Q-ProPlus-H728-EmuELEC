@@ -4,7 +4,7 @@
 
 这是针对 **X96Q Pro+（H728）** 整合的 EmuELEC 4.8 双版本纯净映像，默认采用 Crystal 主题、繁体中文，并支持首次创建 FAT32 `EEROMS` 游戏分区。
 
-> **兼容性提示**：主要在作者的 X96Q Pro+ H728 原机上进行开发和验证。其他标示 H728 的盒子，遥控器及开机方式可能不同，**未实测，不保证兼容**。刷写之前务必备份 SD 卡。
+> **兼容性提示**：主要在作者的 X96Q Pro+ H728 原机上进行开发和验证。其他标示 H728 的盒子，遥控器及开机方式可能不同，**未实测，不保证兼容**。刷写之前务必备份 TF 卡。
 
 ## Root 与 NoRoot 有什么区别？
 
@@ -26,12 +26,12 @@
 
 ## 和一般 EmuELEC 4.8 有什么不同？
 
-- **为 X96Q Pro+ 准备的版本**：不用自己研究如何让盒子通过 SD 卡进入 EmuELEC。
+- **为 X96Q Pro+ 准备的版本**：不用自己研究如何让盒子通过 TF 卡进入 EmuELEC。
 - **原装遥控器可以关机、唤醒**：NoRoot 唤醒后进入 EmuELEC；Root 唤醒后返回 Android。
 - **原装遥控器操作**：可以用上下左右方向键移动，并用返回、确认按键操作菜单。
 - **蓝牙功能**：可以使用系统内的蓝牙连接功能。
 - **一拖二手柄**：支持识别两个手柄，也能按需要分别设置。
-- **游戏空间自动设置**：第一次进入 EmuELEC 时，根据 SD 卡容量创建游戏分区；以后正常开机不用重复设置。
+- **游戏空间自动设置**：第一次进入 EmuELEC 时，根据 TF 卡容量创建游戏分区；以后正常开机不用重复设置。
 - **开机就有熟悉的界面**：默认 Crystal 主题、繁体中文、游戏分类文件夹和已整合的模拟器核心。游戏和需要的 BIOS 请自行准备。
 - **想用 Android 也能玩游戏**：Root 版可从原厂 Android 使用 GameSwitch APK 进入 EmuELEC。
 
@@ -39,15 +39,15 @@
 
 请从 [GitHub Releases](../../releases) 下载最新正式版：`X96Q pro+_H728_EmuELEC_4.8_NoRoot.7z`（纯 EE）、`X96Q pro+_H728_EmuELEC_4.8_Root.7z`（Android＋EE）以及仅供 Root 版使用的 `H728-GameSwitch.apk`。每个压缩包解压后都是 4 GiB 的 IMG。
 
-1. 备份 SD 卡，用 7-Zip 解压 `.7z`，获得 `.img`。
-2. 使用 [balenaEtcher](https://etcher.balena.io/) 选择 IMG 和正确 SD 卡，烧录并完成验证。**不要选择电脑系统盘或 Android eMMC。**
+1. 备份 TF 卡，用 7-Zip 解压 `.7z`，获得 `.img`。
+2. 使用 [balenaEtcher](https://etcher.balena.io/) 选择 IMG 和正确 TF 卡，烧录并完成验证。**不要选择电脑系统盘或 Android eMMC。**
 3. NoRoot 插卡开机进入 EE；Root 插卡后默认进入原机 Android，在 Android 已有 ROOT／`su` 授权下安装 GameSwitch APK，切换进入 EE。
 4. 首次进入 EE 时，等待创建和扩容 FAT32 `EEROMS` 以及核心初始化完成。不要在此过程中断电或拔卡。
 5. 之后正常重启，不应该再次格式化已经建立的 EEROMS。
 
 ## 如何添加游戏？
 
-初始化完成后，将 SD 卡连接电脑，打开 FAT32 `EEROMS` 分区。把你合法持有的游戏文件按平台放在对应的 `roms` 目录（例如 `roms/nes`、`roms/snes`、`roms/psx`，以实际生成的目录为准）。某些平台需要自行准备合法的 BIOS 文件，放在对应的 `bios` 位置。安全弹出卡片并返回 EE，刷新游戏列表。请先备份存档，不要覆盖自己的游戏数据。
+初始化完成后，将 TF 卡连接电脑，打开 FAT32 `EEROMS` 分区。把你合法持有的游戏文件按平台放在对应的 `roms` 目录（例如 `roms/nes`、`roms/snes`、`roms/psx`，以实际生成的目录为准）。某些平台需要自行准备合法的 BIOS 文件，放在对应的 `bios` 位置。安全弹出卡片并返回 EE，刷新游戏列表。请先备份存档，不要覆盖自己的游戏数据。
 
 ## 限制说明
 

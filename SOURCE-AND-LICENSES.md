@@ -6,7 +6,9 @@ This project combines independent board-specific integration with upstream open-
 
 - Published and SHA-verified **partial board source**: [H728 source snapshot and manifest](source/README.md).
 - Published **EmuELEC 4.8 local board modifications**: [H728 EmuELEC 4.8 patches and overlays](source/emuelec-4.8/README.md).
-- **Still pending:** independent validation that these files, upstream revisions and any remaining local modifications comprise the COMPLETE corresponding source and scripts for all GPL-covered binaries in both firmware images. Do not represent the source requirement as finished yet.
+- Published final SD/MMC source delta and rebuild helpers: [final-sdpm](source/final-sdpm/), [core-build](source/core-build/), and [Root image rebuild](source/dualboot-rebuild/).
+- Formal source audit manifest: [SOURCE_AUDIT_20261014.json](source/SOURCE_AUDIT_20261014.json). It ties the two formal image hashes to the exact upstream revisions and H728-local source/config/build inputs.
+- The EmuELEC 4.8 tree at the pinned upstream commit remains the base for unchanged package sources; H728-local EmuELEC changes are published under [source/emuelec-4.8](source/emuelec-4.8/). No game ROM or BIOS content is distributed by this project.
 - Build commit hashes and patch lists: **PENDING source audit**.
 - Third-party APK licensing and inclusion must be checked before public distribution.
 

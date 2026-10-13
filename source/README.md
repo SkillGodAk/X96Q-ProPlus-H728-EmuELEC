@@ -8,4 +8,4 @@ This archive was recovered from the actual Ubuntu 22.04.5 H728 build environment
 - Upstream TF-A: b5de74a685fb73b784e45bbbd18dd9a0c528d8b2
 - EmuELEC 4.8 base: 02b45fe53b85c45c75dbad8e44a648092dec2e72
 
-This is a source-preservation checkpoint, NOT yet certified as complete corresponding source for every GPL-covered binary distributed in the images. Full-tree differences and local EmuELEC patch provenance are still being audited. See ../SOURCE-AND-LICENSES.md for remaining source requirements.
+The original 27-file snapshot was a preservation checkpoint. The formal release audit now also includes the accepted final SD/MMC delta, core build helpers, Root image rebuild scripts and EmuELEC 4.8 local patches. See SOURCE_AUDIT_20261014.json and ../SOURCE-AND-LICENSES.md for the exact hashes, upstream commits and source layout.

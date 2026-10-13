@@ -1,0 +1,9 @@
+{
+  "base_sha256": "885cb0dec475d25436a5602eb890b71a95c3bcb036b87b14e5dba4ccc674a01a",
+  "candidate_sha256": "05b30029d76e1afd7ac12ac5b8eb856f3cc4c3f0d6c694e4604174635fdcc490",
+  "scope": "X96Q Pro+ A523 boot SD controller at 0x04020000 only",
+  "system_sleep_pm_unchanged": true,
+  "frequency_voltage_dma_unchanged": true,
+  "physical_sd_written": false,
+  "acceptance": "NOT PROVEN; controlled runtime-PM candidate"
+}

@@ -71,10 +71,6 @@ If this project has been helpful, you can support its independent development.
 
 <a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
-**Bank donation:**
-
-<img src="assets/donate-bank.jpg" alt="Bank donation QR code" width="180">
-
 **WeChat donation:**
 
 <img src="assets/donate-wechat.jpg" alt="WeChat donation QR code" width="180">

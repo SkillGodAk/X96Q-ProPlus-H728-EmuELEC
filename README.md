@@ -76,9 +76,6 @@
 
 <a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
-**銀行收款：**
-
-<img src="assets/donate-bank.jpg" alt="銀行贊助 QR Code" width="180">
 
 **微信收款：**
 

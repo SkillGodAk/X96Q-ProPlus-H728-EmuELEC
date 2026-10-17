@@ -67,13 +67,18 @@ Only the original device combination has direct compatibility evidence. Other H7
 
 If this project has been helpful, you can support its independent development.
 
-**International donations:**
+### International support
 
 <a href="https://buymeacoffee.com/SkillGodAK"><img src="assets/donate-buymeacoffee.svg" alt="Buy Me a Coffee" width="180"></a>
 
-**WeChat donation:**
+### WeChat support
 
 <img src="assets/donate-wechat.jpg" alt="WeChat donation QR code" width="180">
+
+### Taiwan support
+
+<img src="https://raw.githubusercontent.com/SkillGodAk/SkillGodAk/main/assets/donate-taiwan.jpg" alt="Taiwan donation QR code" width="180">
+
 
 ---
 

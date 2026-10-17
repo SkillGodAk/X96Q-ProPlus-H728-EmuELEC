@@ -63,3 +63,6 @@ Once setup finishes, connect the TF card to a computer and open the FAT32 **`EER
 
 Only the original device combination has direct compatibility evidence. Other H728 devices, third-party remotes, and modified Android environments are unverified. This project does not provide copyrighted game ROMs, BIOS, or stock Android images; it does not gain ROOT access for you. Unofficial third-party integration; no endorsement by EmuELEC or the device vendor is implied.
 
+---
+
+Unofficial third-party integration. Open-source notices and corresponding-source information: [SOURCE-AND-LICENSES.md](SOURCE-AND-LICENSES.md).

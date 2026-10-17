@@ -53,3 +53,6 @@
 
 本项目不提供游戏 ROM、BIOS 或原厂 Android 映像；不保证其他 H728 盒子、第三方遥控器或非原厂 Android 的兼容性。Root 版需要现有 Android `su`，不负责获取 ROOT。此项目不是 EmuELEC 或盒子厂商的官方作品。
 
+---
+
+第三方非官方开源整合。对应源代码与许可见 [SOURCE-AND-LICENSES.md](SOURCE-AND-LICENSES.md)。

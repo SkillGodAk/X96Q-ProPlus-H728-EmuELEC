@@ -68,3 +68,6 @@
 - 按照不同 TF 卡容量，首次 EEROMS 擴容時間可能不同。勿中斷；若有錯誤，請保留畫面和日誌回報。
 - 本專案不是 EmuELEC／裝置品牌官方發行版；商標與上游成果歸各自權利人所有。
 
+---
+
+本專案為非官方第三方整合；不提供遊戲 ROM、BIOS 或原廠 Android 映像。包含開源元件的發行與原始碼取得資訊請參閱 [SOURCE-AND-LICENSES.md](SOURCE-AND-LICENSES.md)。
